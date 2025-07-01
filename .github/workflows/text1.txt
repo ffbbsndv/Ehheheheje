@@ -2259,7 +2259,7 @@ elseif k == "rightbracket" then
 		char.Humanoid.WalkSpeed = 1000*char:GetScale()
         timeposcur = sound69.TimePosition 
 sound69:Play()
-        playanim(83070385097572)
+        playanim(83070385097572,2)
     else
         char.Humanoid.WalkSpeed = 14*char:GetScale()
 		stopanim()
