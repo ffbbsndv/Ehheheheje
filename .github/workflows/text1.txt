@@ -2209,11 +2209,12 @@ elseif k == "v" then
         stopanim()
         dancing = true
         task.wait(.005)
-        sound69.SoundId = customasset("Dances/danceifyourethegoat.mp3")
+        sound69.SoundId = customasset("Dances/KontonV2.mp3")
+        sound69.Volume = 1.5
 		char.Humanoid.WalkSpeed = 8*char:GetScale()
         timeposcur = sound69.TimePosition 
 sound69:Play()
-        playanim(88110878712745,2)
+        playanim(124417797980484)
     else
         char.Humanoid.WalkSpeed = 14*char:GetScale()
 		stopanim()
@@ -2224,11 +2225,11 @@ elseif k == "n" then
         stopanim()
         dancing = true
         task.wait(.005)
-        sound69.SoundId = customasset("Dances/danceifyourethegoat.mp3")
+        sound69.SoundId = customasset("Dances/Static.mp3")
 		char.Humanoid.WalkSpeed = 8*char:GetScale()
         timeposcur = sound69.TimePosition 
 sound69:Play()
-        playanim(131031060776962,3)
+        playanim(139065991651723)
     else
         char.Humanoid.WalkSpeed = 14*char:GetScale()
 		stopanim()
@@ -2254,11 +2255,11 @@ elseif k == "rightbracket" then
         stopanim()
         dancing = true
         task.wait(.005)
-        sound69.SoundId = customasset("Dances/danceifyourethegoat.mp3")
+        sound69.SoundId = customasset("Dances/LiarDancer.mp3")
 		char.Humanoid.WalkSpeed = 1000*char:GetScale()
         timeposcur = sound69.TimePosition 
 sound69:Play()
-        playanim(105555482421711,1.5)
+        playanim(83070385097572)
     else
         char.Humanoid.WalkSpeed = 14*char:GetScale()
 		stopanim()
