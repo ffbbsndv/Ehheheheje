@@ -651,9 +651,9 @@ lol = true
 end
 local sprinting = false 
 local is = game:GetService("InsertService")
-local idleanim = is:LoadLocalAsset("rbxassetid://109384377110496")
-local walkanim = is:LoadLocalAsset("rbxassetid://110028328440114")
-local sprintanim = is:LoadLocalAsset("rbxassetid://98888981601788")
+local idleanim = is:LoadLocalAsset("rbxassetid://81695490432784")
+local walkanim = is:LoadLocalAsset("rbxassetid://84471010390929")
+local sprintanim = is:LoadLocalAsset("rbxassetid://136573946687203")
 local randompart = Instance.new("Part",game:GetService("RunService"))
 local coolparticles = is:LoadLocalAsset("rbxassetid://87299663038091").ParticleAttachment
 coolparticles.Parent = randompart
@@ -1940,11 +1940,11 @@ if k == "q" then
         stopanim()
         dancing = true
         task.wait(.005)
-        sound69.SoundId = customasset("Dances/C14.mp3")
+        sound69.SoundId = customasset("Dances/GetDown.mp3")
 		char.Humanoid.WalkSpeed = 8*char:GetScale()
         timeposcur = sound69.TimePosition 
 sound69:Play()
-        playanim(136801345243320,2)
+        playanim(98916367562022)
     else
         char.Humanoid.WalkSpeed = 14*char:GetScale()
 		stopanim()
@@ -2132,20 +2132,6 @@ sound69:Play()
     else
         char.Humanoid.WalkSpeed = 14*char:GetScale()
 		stopanim()
-        
-    end
-
-elseif k == "quote" then 
-    if dancing == false then 
-        stopanim()
-        dancing = true
-        task.wait(.005)
-        sound69.SoundId = customasset("Dances/GetDown.mp3")
-        timeposcur = sound69.TimePosition 
-sound69:Play()
-        playanim(98916367562022)
-    else
-        stopanim()
         
     end
 elseif k == "z" then 
