@@ -2140,10 +2140,10 @@ elseif k == "quote" then
         stopanim()
         dancing = true
         task.wait(.005)
-        sound69.SoundId = customasset("Dances/danceifyourethegoat.mp3")
+        sound69.SoundId = customasset("Dances/GetDown.mp3")
         timeposcur = sound69.TimePosition 
 sound69:Play()
-        playanim(94638356008696,4)
+        playanim(98916367562022)
     else
         stopanim()
         
@@ -2161,29 +2161,17 @@ sound69:Play()
         stopanim()
         
     end
-elseif k == "z" then 
-    if dancing == false then 
-        stopanim()
-        dancing = true
-        task.wait(.005)
-        sound69.SoundId = customasset("Dances/danceifyourethegoat.mp3")
-        timeposcur = sound69.TimePosition 
-sound69:Play()
-        playanim(13294790250)
-    else
-        stopanim()
-        
-    end
 elseif k == "x" then 
     if dancing == false then 
         stopanim()
         dancing = true
         task.wait(.005)
-        sound69.SoundId = customasset("Dances/danceifyourethegoat.mp3")
+        sound69.SoundId = customasset("Dances/HearMeTonight.mp3")
+        sound69.Volume = 1.5
 		char.Humanoid.WalkSpeed = 8*char:GetScale()
         timeposcur = sound69.TimePosition 
 sound69:Play()
-        playanim(82974998324452,10)
+        playanim(13843669201)
     else
         char.Humanoid.WalkSpeed = 14*char:GetScale()
 		stopanim()
@@ -2198,7 +2186,7 @@ elseif k == "c" then
 		char.Humanoid.WalkSpeed = 6*char:GetScale()
         timeposcur = sound69.TimePosition 
 sound69:Play()
-        playanim(98605693116996,0.75)
+        playanim(107578737342278)
     else
         char.Humanoid.WalkSpeed = 14*char:GetScale()
 		stopanim()
@@ -2225,7 +2213,7 @@ elseif k == "n" then
         stopanim()
         dancing = true
         task.wait(.005)
-        sound69.SoundId = customasset("Dances/Static.mp3")
+        sound69.SoundId = customasset("Dances/Static2009.mp3")
 		char.Humanoid.WalkSpeed = 8*char:GetScale()
         timeposcur = sound69.TimePosition 
 sound69:Play()
@@ -2240,11 +2228,11 @@ elseif k == "comma" then
         stopanim()
         dancing = true
         task.wait(.005)
-        sound69.SoundId = customasset("Dances/danceifyourethegoat.mp3")
+        sound69.SoundId = customasset("Dances/Rabbit.mp3")
 		char.Humanoid.WalkSpeed = 8*char:GetScale()
         timeposcur = sound69.TimePosition 
 sound69:Play()
-        playanim(91787441180652,2)
+        playanim(86947150862846)
     else
         char.Humanoid.WalkSpeed = 14*char:GetScale()
 		stopanim()
@@ -2295,9 +2283,9 @@ if k == "m" then
 if mode == 3 then 
 mode = 4
     game:GetService("StarterGui"):SetCore("SendNotification", {
-	Title = "Combat Anims";
+	Title = "KDV3 Modded V2";
 	Duration = 5;
-	Text = "tsb thing from test sigma idk"
+	Text = "Switching to page 4"
 })
 elseif mode == 2 then 
     mode = 3
