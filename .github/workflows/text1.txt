@@ -651,9 +651,9 @@ lol = true
 end
 local sprinting = false 
 local is = game:GetService("InsertService")
-local idleanim = is:LoadLocalAsset("rbxassetid://81695490432784")
-local walkanim = is:LoadLocalAsset("rbxassetid://84471010390929")
-local sprintanim = is:LoadLocalAsset("rbxassetid://136573946687203")
+local idleanim = is:LoadLocalAsset("rbxassetid://123441836092792")
+local walkanim = is:LoadLocalAsset("rbxassetid://71214385249268")
+local sprintanim = is:LoadLocalAsset("rbxassetid://135801672920476")
 local randompart = Instance.new("Part",game:GetService("RunService"))
 local coolparticles = is:LoadLocalAsset("rbxassetid://87299663038091").ParticleAttachment
 coolparticles.Parent = randompart
@@ -1065,9 +1065,9 @@ end
             sound69.PlaybackSpeed = 1
             if playbacktrack == true then 
                            if lol ~= true then 
-            sound69.SoundId = customasset("Dances/StardustSpeedway.mp3")
+            sound69.SoundId = customasset("Dances/JerseyNova.mp3")
                 else 
-                      sound69.SoundId = customasset("Dances/StardustSpeedway.mp3")  
+                      sound69.SoundId = customasset("Dances/JerseyNova.mp3")  
                 end
             sound69.Volume = 1.25
             else 
