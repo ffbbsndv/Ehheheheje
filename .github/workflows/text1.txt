@@ -653,7 +653,7 @@ local sprinting = false
 local is = game:GetService("InsertService")
 local idleanim = is:LoadLocalAsset("rbxassetid://123441836092792")
 local walkanim = is:LoadLocalAsset("rbxassetid://112652808147178")
-local sprintanim = is:LoadLocalAsset("rbxassetid://135801672920476")
+local sprintanim = is:LoadLocalAsset("rbxassetid://82609803681213")
 local randompart = Instance.new("Part",game:GetService("RunService"))
 local coolparticles = is:LoadLocalAsset("rbxassetid://87299663038091").ParticleAttachment
 coolparticles.Parent = randompart
@@ -2049,11 +2049,11 @@ elseif k == "f" then
         stopanim()
         dancing = true
         task.wait(.005)
-        sound69.SoundId = customasset("Dances/2Two2.mp3")
+        sound69.SoundId = customasset("Dances/bouncin.mp3")
 		char.Humanoid.WalkSpeed = 12*char:GetScale()
         timeposcur = sound69.TimePosition
         sound69:Play()
-        playanim(132144576305869,2)
+        playanim(18986228959)
     else
         char.Humanoid.WalkSpeed = 12*char:GetScale()
 		stopanim()
@@ -2064,11 +2064,11 @@ elseif k == "g" then
         stopanim()
         dancing = true
         task.wait(.005)
-        sound69.SoundId = customasset("Dances/Flops.mp3")
+        sound69.SoundId = customasset("Dances/StardustSpeedway.mp3")
 		char.Humanoid.WalkSpeed = 12*char:GetScale()
         timeposcur = sound69.TimePosition 
 sound69:Play()
-        playanim(122878040721056)
+        playanim(130996118600902)
     else
         char.Humanoid.WalkSpeed = 12*char:GetScale()
 		stopanim()
@@ -2079,11 +2079,11 @@ elseif k == "h" then
         stopanim()
         dancing = true
         task.wait(.005)
-        sound69.SoundId = customasset("Dances/Wait.mp3")
+        sound69.SoundId = customasset("Dances/Specialist.mp3")
 		char.Humanoid.WalkSpeed = 12*char:GetScale()
         timeposcur = sound69.TimePosition 
 sound69:Play()
-        playanim(119813505721636,2,5)
+        playanim(71619235688781)
     else
         char.Humanoid.WalkSpeed = 12*char:GetScale()
 		stopanim()
