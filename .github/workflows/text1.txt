@@ -2124,7 +2124,7 @@ elseif k == "l" then
         stopanim()
         dancing = true
         task.wait(.005)
-        sound69.SoundId = customasset("Dances/chronoshift.mp3")
+        sound69.SoundId = customasset("Dances/ChronoshiftRemix.mp3")
 		char.Humanoid.WalkSpeed = 8*char:GetScale()
         timeposcur = sound69.TimePosition 
 sound69:Play()
@@ -2233,7 +2233,7 @@ elseif k == "rightbracket" then
 		char.Humanoid.WalkSpeed = 1000*char:GetScale()
         timeposcur = sound69.TimePosition 
 sound69:Play()
-        playanim(113034023089547)
+        playanim(113034023089547,2)
     else
         char.Humanoid.WalkSpeed = 14*char:GetScale()
 		stopanim()
@@ -2305,7 +2305,7 @@ char.Humanoid:GetPropertyChangedSignal("MoveDirection"):Connect(function()
 	stopanim()
 	fwait(1/500)
         if idle == true and walking == false and char.Humanoid.MoveDirection == Vector3.new(0,0,0) and dancing == false and playanother==true then
-            playanim(83465205704188,2,false,idleanim )
+            playanim(83465205704188,1.5,false,idleanim )
             end
         elseif char.Humanoid.MoveDirection ~= Vector3.new(0,0,0) and dancing == false and walking == false then 
             char.Humanoid.WalkSpeed = 12*char:GetScale()
