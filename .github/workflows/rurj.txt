@@ -1832,6 +1832,12 @@ game:GetService("StarterGui"):SetCore("SendNotification", {
 })
 task.wait(3)
 game:GetService("StarterGui"):SetCore("SendNotification", {
+	Title = "Credits";
+	Duration = 2;
+	Text = " To Theo for intro anim"
+})
+task.wait(3)
+game:GetService("StarterGui"):SetCore("SendNotification", {
 	Title = "EKDV1";
 	Duration = 2;
 	Text = "Epicified Krystal Dance V1"
