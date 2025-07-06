@@ -2128,7 +2128,7 @@ elseif k == "l" then
 		char.Humanoid.WalkSpeed = 8*char:GetScale()
         timeposcur = sound69.TimePosition 
 sound69:Play()
-        playanim(136302258505787)
+        playanim(136302258505787,2)
     else
         char.Humanoid.WalkSpeed = 14*char:GetScale()
 		stopanim()
@@ -2231,6 +2231,7 @@ elseif k == "rightbracket" then
         dancing = true
         task.wait(.005)
         sound69.SoundId = customasset("Dances/24HourCinderella.mp3")
+        sound69.Volume = 1.75
         coolparticles.Parent = char.Torso
 		char.Humanoid.WalkSpeed = 8*char:GetScale()
         timeposcur = sound69.TimePosition 
