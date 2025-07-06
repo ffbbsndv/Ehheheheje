@@ -2215,6 +2215,7 @@ elseif k == "comma" then
         dancing = true
         task.wait(.005)
         sound69.SoundId = customasset("Dances/Rabbit.mp3")
+        coolparticles.Parent = char.Torso
 		char.Humanoid.WalkSpeed = 8*char:GetScale()
         timeposcur = sound69.TimePosition 
 sound69:Play()
@@ -2230,7 +2231,8 @@ elseif k == "rightbracket" then
         dancing = true
         task.wait(.005)
         sound69.SoundId = customasset("Dances/24HourCinderella.mp3")
-		char.Humanoid.WalkSpeed = 1000*char:GetScale()
+        coolparticles.Parent = char.Torso
+		char.Humanoid.WalkSpeed = 8*char:GetScale()
         timeposcur = sound69.TimePosition 
 sound69:Play()
         playanim(113034023089547,2)
