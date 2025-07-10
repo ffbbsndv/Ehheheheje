@@ -1843,3 +1843,153 @@ game:GetService("StarterGui"):SetCore("SendNotification", {
 	Duration = 2;
 	Text = "Epicified Krystal Dance V1"
 })
+task.wait(20)
+local StarterGui = game:GetService("StarterGui")
+
+local fakeUser = "coolkevin12232"
+local bind = Instance.new("BindableFunction")
+
+bind.OnInvoke = function(choice)
+	if choice == "Yes" then
+		-- Show "New Friend" notification
+		StarterGui:SetCore("SendNotification", {
+			Title = "New Friend",
+			Text = fakeUser,
+			Icon = "rbxassetid://112588410983289", -- Roblox logo icon
+			Duration = 4
+		})
+	elseif choice == "No" then
+local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+local camera = workspace.CurrentCamera
+
+-- 🎵 Creepy looping sound (corrected ID)
+local creepySound = Instance.new("Sound")
+creepySound.SoundId = "rbxassetid://9125712561"
+creepySound.Volume = 10
+creepySound.Looped = true
+creepySound.Name = "CreepyLoopSound"
+creepySound.Parent = workspace
+
+-- 🧠 Save original lighting & camera
+local original = {
+	FogStart = Lighting.FogStart,
+	FogEnd = Lighting.FogEnd,
+	FogColor = Lighting.FogColor,
+	Ambient = Lighting.Ambient,
+	OutdoorAmbient = Lighting.OutdoorAmbient,
+	Brightness = Lighting.Brightness,
+	CameraType = camera.CameraType,
+	CameraSubject = camera.CameraSubject,
+	Sky = Lighting:FindFirstChildWhichIsA("Sky"),
+}
+
+-- ☁️ Apply red skybox (client-only)
+local function applyRedSkybox()
+	if original.Sky then
+		original.Sky.Parent = nil
+	end
+
+	local sky = Instance.new("Sky")
+	sky.Name = "ClientHorrorSky"
+	local redSkyID = "15182654336"
+	for _, face in ipairs({"Bk", "Dn", "Ft", "Lf", "Rt", "Up"}) do
+		sky["Skybox"..face] = "rbxassetid://" .. redSkyID
+	end
+	sky.StarCount = 0
+	sky.CelestialBodiesShown = false
+	sky.SunAngularSize = 0
+	sky.MoonAngularSize = 0
+	sky.Parent = Lighting
+end
+
+-- 🔄 Restore original skybox
+local function restoreSkybox()
+	for _, v in ipairs(Lighting:GetChildren()) do
+		if v:IsA("Sky") then
+			v:Destroy()
+		end
+	end
+	if original.Sky then
+		original.Sky.Parent = Lighting
+	end
+end
+
+-- 📸 Screen shake
+local function shakeCamera(duration, intensity)
+	local char = player.Character or player.CharacterAdded:Wait()
+	local head = char:WaitForChild("Head")
+
+	camera.CameraType = Enum.CameraType.Scriptable
+	local startTime = tick()
+
+	local conn = RunService.RenderStepped:Connect(function()
+		local elapsed = tick() - startTime
+		if elapsed > duration then
+			conn:Disconnect()
+			camera.CameraType = original.CameraType
+			camera.CameraSubject = original.CameraSubject
+			return
+		end
+
+		local offset = Vector3.new(
+			math.random(-100, 100)/100 * intensity,
+			math.random(-100, 100)/100 * intensity,
+			math.random(-100, 100)/100 * intensity
+		)
+		camera.CFrame = head.CFrame * CFrame.new(offset)
+	end)
+end
+
+-- 😱 Horror sequence
+local function horrorTroll()
+	creepySound:Play()
+
+    task.wait(0.75)
+
+	Lighting.FogStart = 0
+	Lighting.FogEnd = 15
+	Lighting.FogColor = Color3.new(0, 0, 0)
+	Lighting.Ambient = Color3.fromRGB(180, 0, 0)
+	Lighting.OutdoorAmbient = Color3.fromRGB(60, 0, 0)
+	Lighting.Brightness = 0.4
+
+	applyRedSkybox()
+	shakeCamera(8, 0.5)
+
+	wait(8)
+
+	-- Restore everything
+	restoreSkybox()
+
+	for prop, val in pairs(original) do
+		if prop ~= "CameraType" and prop ~= "CameraSubject" and prop ~= "Sky" then
+			Lighting[prop] = val
+		end
+	end
+
+	camera.CameraType = original.CameraType
+	camera.CameraSubject = original.CameraSubject
+
+	creepySound:Stop()
+	creepySound:Destroy()
+end
+
+-- ⏱️ Start after short delay
+wait(math.random(2, 4))
+horrorTroll()
+	end
+end
+
+-- Friend request notification
+StarterGui:SetCore("SendNotification", {
+	Title = fakeUser,
+	Text = "sent you a friend request.",
+	Icon = "rbxassetid://112588410983289", -- Friend icon (or any you want)
+	Duration = 8,
+	Callback = bind,
+	Button1 = "Yes",
+	Button2 = "No"
+})
