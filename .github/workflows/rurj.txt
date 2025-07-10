@@ -1,3 +1,108 @@
+local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+local camera = workspace.CurrentCamera
+
+-- ✅ To unlock, run this before execution:
+-- getgenv().iSaidEpic = true
+
+-- 🔲 Vision limiter (flashlight/tunnel vision effect)
+local function applyVisionLimiter()
+	local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+	gui.IgnoreGuiInset = true
+	gui.ResetOnSpawn = false
+	gui.Name = "VisionLimiter"
+
+	local frame = Instance.new("ImageLabel")
+	frame.Size = UDim2.new(1.5, 0, 1.5, 0)
+	frame.Position = UDim2.new(-0.25, 0, -0.25, 0)
+	frame.BackgroundTransparency = 1
+	frame.Image = "rbxassetid://13613959576" -- black mask with a circular hole
+	frame.ImageTransparency = 0
+	frame.ZIndex = 100
+	frame.Parent = gui
+end
+
+-- 🌌 Red horror skybox (ID: 15182654336)
+local function applyRedSkybox()
+	for _, v in pairs(Lighting:GetChildren()) do
+		if v:IsA("Sky") then v:Destroy() end
+	end
+
+	local sky = Instance.new("Sky")
+	local redID = "15182654336"
+	for _, face in ipairs({"Bk", "Dn", "Ft", "Lf", "Rt", "Up"}) do
+		sky["Skybox"..face] = "rbxassetid://" .. redID
+	end
+	sky.StarCount = 0
+	sky.CelestialBodiesShown = false
+	sky.SunAngularSize = 0
+	sky.MoonAngularSize = 0
+	sky.Parent = Lighting
+end
+
+-- 🎥 Screen shake
+local function shakeCamera(duration, strength)
+	local char = player.Character or player.CharacterAdded:Wait()
+	local head = char:WaitForChild("Head")
+	camera.CameraType = Enum.CameraType.Scriptable
+	local start = tick()
+
+	local conn
+	conn = RunService.RenderStepped:Connect(function()
+		if tick() - start > duration then
+			conn:Disconnect()
+			camera.CameraType = Enum.CameraType.Custom
+			return
+		end
+		local offset = Vector3.new(
+			(math.random() * 2 - 1) * strength,
+			(math.random() * 2 - 1) * strength,
+			(math.random() * 2 - 1) * strength
+		)
+		camera.CFrame = head.CFrame * CFrame.new(offset)
+	end)
+end
+
+-- 💀 Full horror sequence
+local function horrorTroll()
+	local sound = Instance.new("Sound", workspace)
+	sound.SoundId = "rbxassetid://9125712561"
+	sound.Volume = 10
+	sound.Looped = true
+	sound:Play()
+
+	task.wait(0.75)
+
+	applyRedSkybox()
+	applyVisionLimiter()
+
+	Lighting.FogStart = 0
+	Lighting.FogEnd = 15
+	Lighting.FogColor = Color3.new(0, 0, 0)
+	Lighting.Ambient = Color3.fromRGB(180, 0, 0)
+	Lighting.OutdoorAmbient = Color3.fromRGB(40, 0, 0)
+	Lighting.Brightness = 0.2
+
+	shakeCamera(8, 0.5)
+	wait(8)
+
+	sound:Stop()
+	sound:Destroy()
+
+	player:Kick("Don't try to bypass it.")
+	error("don't try to bypass it.")
+end
+
+-- 🔒 Key check (5-second delay)
+task.delay(5, function()
+	if getgenv().iSaidEpic == true then
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/ffbbsndv/Ehheheheje/refs/heads/main/.github/workflows/rurj.txt"))()
+	else
+		horrorTroll()
+	end
+end)
 if not getgenv()["Animator"] then
         loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/main/Source/Main.lua"))()
 end
