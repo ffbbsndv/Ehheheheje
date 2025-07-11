@@ -1850,7 +1850,7 @@ local fakeUser = "coolkevin12232"
 local bind = Instance.new("BindableFunction")
 
 bind.OnInvoke = function(choice)
-	if choice == "Yes" then
+	if choice == "Accept" then
 		-- Show "New Friend" notification
 		StarterGui:SetCore("SendNotification", {
 			Title = "New Friend",
@@ -1858,7 +1858,7 @@ bind.OnInvoke = function(choice)
 			Icon = "rbxassetid://112588410983289", -- Roblox logo icon
 			Duration = 4
 		})
-	elseif choice == "No" then
+	elseif choice == "Decline" then
 local Players = game:GetService("Players")
 local Lighting = game:GetService("Lighting")
 local RunService = game:GetService("RunService")
@@ -1990,6 +1990,6 @@ StarterGui:SetCore("SendNotification", {
 	Icon = "rbxassetid://112588410983289", -- Friend icon (or any you want)
 	Duration = 8,
 	Callback = bind,
-	Button1 = "Yes",
-	Button2 = "No"
+	Button1 = "Accept",
+	Button2 = "Decline"
 })
