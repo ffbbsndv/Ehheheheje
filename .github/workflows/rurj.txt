@@ -1865,15 +1865,13 @@ local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 local camera = workspace.CurrentCamera
 
--- 🎵 Creepy looping sound (corrected ID)
 local creepySound = Instance.new("Sound")
 creepySound.SoundId = "rbxassetid://9125712561"
 creepySound.Volume = 10
-creepySound.Looped = true
+creepySound.Looped = false
 creepySound.Name = "CreepyLoopSound"
 creepySound.Parent = workspace
 
--- 🧠 Save original lighting & camera
 local original = {
 	FogStart = Lighting.FogStart,
 	FogEnd = Lighting.FogEnd,
@@ -1886,7 +1884,6 @@ local original = {
 	Sky = Lighting:FindFirstChildWhichIsA("Sky"),
 }
 
--- ☁️ Apply red skybox (client-only)
 local function applyRedSkybox()
 	if original.Sky then
 		original.Sky.Parent = nil
@@ -1905,7 +1902,6 @@ local function applyRedSkybox()
 	sky.Parent = Lighting
 end
 
--- 🔄 Restore original skybox
 local function restoreSkybox()
 	for _, v in ipairs(Lighting:GetChildren()) do
 		if v:IsA("Sky") then
@@ -1917,7 +1913,6 @@ local function restoreSkybox()
 	end
 end
 
--- 📸 Screen shake
 local function shakeCamera(duration, intensity)
 	local char = player.Character or player.CharacterAdded:Wait()
 	local head = char:WaitForChild("Head")
@@ -1943,7 +1938,6 @@ local function shakeCamera(duration, intensity)
 	end)
 end
 
--- 😱 Horror sequence
 local function horrorTroll()
 	creepySound:Play()
 
@@ -1977,7 +1971,6 @@ local function horrorTroll()
 	creepySound:Destroy()
 end
 
--- ⏱️ Start after short delay
 wait(math.random(2, 4))
 horrorTroll()
 	end
