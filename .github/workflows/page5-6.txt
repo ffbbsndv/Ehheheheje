@@ -1610,7 +1610,8 @@ sound69:Play()
 		stopanim()
         
     end
-        end 
+end
+end
 if mode == 5 then
 if k == "e" then 
     if dancing == false then 
