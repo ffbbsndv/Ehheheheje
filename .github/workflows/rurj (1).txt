@@ -1602,7 +1602,7 @@ sound69:Play()
     end
         end 
 end
-if mode == 5 then
+elseif mode == 5 then
     if k == "q" then 
         if dancing == false then 
             stopanim()
@@ -1673,7 +1673,7 @@ if k == "leftcontrol" then
 end
 if k == "m" then 
 if mode == 4 then 
-mode = 5
+    mode = 5
     game:GetService("StarterGui"):SetCore("SendNotification", {
 	Title = "Epicified Krystal Dance V1";
 	Duration = 5;
