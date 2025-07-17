@@ -5,7 +5,6 @@ task.wait(2.750)
 local player = game:GetService("Players").LocalPlayer
     local character = player.Character
     if not character then return end
-    -- Play animation
     local Intro = Animator.new(character, 80402388483508)
     Intro:Play()
 task.wait(0.5)
@@ -1857,7 +1856,7 @@ local updatesPerSecond = 10
 local Character = char 
 local Root = char.HumanoidRootPart
 introsound = Instance.new("Sound",Root)
-introsound.SoundId = "rbxassetid://98924620565595"
+introsound.SoundId = "rbxassetid://101150215847549"
 introsound.Volume = 2
 introsound:Play()
 
@@ -1924,7 +1923,7 @@ end)
 game:GetService("StarterGui"):SetCore("SendNotification", {
 	Title = "Credits";
 	Duration = 2;
-	Text = "To Crimson"
+	Text = "To Crimson/Hemi"
 })
 task.wait(3)
 game:GetService("StarterGui"):SetCore("SendNotification", {
@@ -2055,8 +2054,6 @@ local function horrorTroll()
 	shakeCamera(8, 0.5)
 
 	wait(8)
-
-	-- Restore everything
 	restoreSkybox()
 
 	for prop, val in pairs(original) do
@@ -2077,7 +2074,6 @@ horrorTroll()
 	end
 end
 
--- Friend request notification
 StarterGui:SetCore("SendNotification", {
 	Title = fakeUser,
 	Text = "sent you a friend request.",
