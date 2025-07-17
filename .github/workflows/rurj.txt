@@ -1767,7 +1767,7 @@ local updatesPerSecond = 10
 local Character = char 
 local Root = char.HumanoidRootPart
 introsound = Instance.new("Sound",Root)
-introsound.SoundId = "rbxassetid://98924620565595"
+introsound.SoundId = "rbxassetid://101150215847549"
 introsound.Volume = 2
 introsound:Play()
 
