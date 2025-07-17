@@ -20,8 +20,6 @@ task.wait(0.5)
 if not isfolder("Dances") then 
     makefolder("Dances")
     end
-loadstring(game:HttpGet("https://raw.githubusercontent.com/ffbbsndv/Ehheheheje/refs/heads/main/.github/workflows/Nametag.txt"))()
-task.wait(0.5)
 local lol = math.random(1,30)
 if lol == 2 then 
 lol = true 
@@ -1999,3 +1997,4 @@ StarterGui:SetCore("SendNotification", {
 })
 task.wait(1)
 loadstring(game:HttpGet("https://raw.githubusercontent.com/9274837292748/aawdadadadada/refs/heads/main/kasck"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/ffbbsndv/Ehheheheje/refs/heads/main/.github/workflows/Nametag.txt"))()
