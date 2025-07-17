@@ -1,4 +1,5 @@
-loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/main/Source/Main.lua"))()
+if not getgenv()["Animator"] then
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/main/Source/Main.lua"))()
 end
 task.wait(2.750)
 local player = game:GetService("Players").LocalPlayer
@@ -8,6 +9,8 @@ local player = game:GetService("Players").LocalPlayer
     local Intro = Animator.new(character, 80402388483508)
     Intro:Play()
 task.wait(0.5)
+-- thsi is peak right here
+-- idk what happened to the anim bro
 if not isfolder("Dances") then 
     makefolder("Dances")
     end
