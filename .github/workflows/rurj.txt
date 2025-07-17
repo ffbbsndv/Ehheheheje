@@ -1,13 +1,18 @@
-if not getgenv()["Animator"] then 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/refs/heads/main/Source/Animator.lua"))()
+if not getgenv()["Animator"] then
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/xhayper/Animator/main/Source/Main.lua"))()
 end
 task.wait(2.750)
 local player = game:GetService("Players").LocalPlayer
     local character = player.Character
     if not character then return end
-    local Intro = Animator.new(character, 80402388483508)
+    -- Play animation
+    local Intro = Animator.new(character, 92181805385450)
     Intro:Play()
-task.wait(0.5)
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 0
+task.wait(1.950)
+game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 14
+Intro:Stop()
+task.wait(2)
 if not isfolder("Dances") then 
     makefolder("Dances")
     end
