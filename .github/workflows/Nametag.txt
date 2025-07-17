@@ -36,7 +36,7 @@ local function SonixHaloSkedaddle(clr)
 
     local mesh = Instance.new("SpecialMesh", Sonixhat)
     mesh.MeshId = "rbxassetid://3270017"
-    mesh.Scale = Vector3.new(4, 1, 4)
+    mesh.Scale = Vector3.new(1.5, 1.5, 1.5)
 
     local light = Instance.new("PointLight", Sonixhat)
     light.Brightness = 6
@@ -45,7 +45,7 @@ local function SonixHaloSkedaddle(clr)
 
     game:GetService("RunService").RenderStepped:Connect(function()
         if Sonixhat and Sonixhat.Parent then
-            Sonixhat.CFrame = CFrame.new(head.Position + Vector3.new(0, 1.5, 0)) * CFrame.Angles(math.rad(15), 0, 0)
+            Sonixhat.CFrame = CFrame.new(head.Position + Vector3.new(0, 1.35, 0)) * CFrame.Angles(math.rad(90), 0, 0)
         end
     end)
 end
