@@ -6,9 +6,11 @@ local player = game:GetService("Players").LocalPlayer
     local character = player.Character
     if not character then return end
     -- Play animation
-    local Intro = Animator.new(character, 80402388483508)
+    local Intro = Animator.new(character, 109569860731042)
     Intro:Play()
-task.wait(2)
+    task.wait(2.7)
+    Intro:Stop()
+task.wait(0.25)
 if not isfolder("Dances") then 
     makefolder("Dances")
     end
