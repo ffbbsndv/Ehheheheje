@@ -1454,7 +1454,7 @@ elseif k == "h" then
 		char.Humanoid.WalkSpeed = 12*char:GetScale()
         timeposcur = sound69.TimePosition 
 sound69:Play()
-        playanim(71619235688781)
+        playanim(71619235688781,2)
     else
         char.Humanoid.WalkSpeed = 12*char:GetScale()
 		stopanim()
@@ -1570,11 +1570,11 @@ elseif k == "n" then
         stopanim()
         dancing = true
         task.wait(.005)
-        sound69.SoundId = customasset("Dances/Static2009.mp3")
+        sound69.SoundId = customasset("Dances/Static.mp3")
 		char.Humanoid.WalkSpeed = 8*char:GetScale()
         timeposcur = sound69.TimePosition 
 sound69:Play()
-        playanim(139065991651723)
+        playanim(139065991651723,2)
     else
         char.Humanoid.WalkSpeed = 14*char:GetScale()
 		stopanim()
