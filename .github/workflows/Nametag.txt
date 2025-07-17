@@ -39,8 +39,8 @@ local function SonixHaloSkedaddle(clr)
     mesh.Scale = Vector3.new(1.5, 1.5, 1.5)
 
     local light = Instance.new("PointLight", Sonixhat)
-    light.Brightness = 2
-    light.Range = 6
+    light.Brightness = 6
+    light.Range = 12
     light.Color = clr
 
     game:GetService("RunService").RenderStepped:Connect(function()
