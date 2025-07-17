@@ -79,7 +79,9 @@ local walking = false
 local idle = false
 local RunService = game:GetService("RunService")
 local function getnext(tbl,number)
+
 if AllowTag = true then
+
 local player = game.Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
 local head = char:WaitForChild("Head")
