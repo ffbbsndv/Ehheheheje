@@ -1,7 +1,8 @@
-local player = game.Players.LocalPlayer
-local char = player.Character or player.CharacterAdded:Wait()
-local head = char:WaitForChild("Head")
-local gui = player:WaitForChild("PlayerGui")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local Head = Character:WaitForChild("Head")
 
 local nametagSonix = {
     { name = "─「 KRYSTAL DANCE 」─", color = Color3.fromRGB(255, 100, 255), weight = 10, rare = true, version = "─1 in 1─" },
@@ -22,43 +23,35 @@ local function GetSonixChildren()
     end
 end
 
-local function SonixHaloSkedaddle(clr)
-    local Sonixhat = Instance.new("Part")
-    Sonixhat.Size = Vector3.new(2, 2, 2)
-    Sonixhat.Anchored = true
-    Sonixhat.CanCollide = false
-    Sonixhat.Material = Enum.Material.Neon
-    Sonixhat.Transparency = 0.2
-    Sonixhat.Color = clr
-    Sonixhat.Name = "SonixHalo"
-    Sonixhat.Position = head.Position + Vector3.new(0, 1.5, 0)
-    Sonixhat.Parent = workspace
+local function SonixHaloSkedaddle(char, color)
+    local head = char:FindFirstChild("Head")
+    if not head then return end
 
-    local mesh = Instance.new("SpecialMesh", Sonixhat)
+    local halo = Instance.new("Part")
+    halo.Name = "SonixHalo"
+    halo.Size = Vector3.new(2, 2, 2)
+    halo.Anchored = true
+    halo.CanCollide = false
+    halo.Material = Enum.Material.Neon
+    halo.Transparency = 0.2
+    halo.Color = color
+    halo.Parent = workspace
+
+    local mesh = Instance.new("SpecialMesh", halo)
     mesh.MeshId = "rbxassetid://3270017"
     mesh.Scale = Vector3.new(1.5, 1.5, 1.5)
 
-    local light = Instance.new("PointLight", Sonixhat)
-    light.Brightness = 6
-    light.Range = 12
-    light.Color = clr
+    local light = Instance.new("PointLight", halo)
+    light.Brightness = 4
+    light.Range = 10
+    light.Color = color
 
-    game:GetService("RunService").RenderStepped:Connect(function()
-        if Sonixhat and Sonixhat.Parent then
-            Sonixhat.CFrame = CFrame.new(head.Position + Vector3.new(0, 1.35, 0)) * CFrame.Angles(math.rad(90), 0, 0)
+    RunService.RenderStepped:Connect(function()
+        if halo and halo.Parent and head then
+            halo.CFrame = CFrame.new(head.Position + Vector3.new(0, 1.35, 0)) * CFrame.Angles(math.rad(90), 0, 0)
         end
     end)
 end
-
-local tag = GetSonixChildren()
-if tag.rare then SonixHaloSkedaddle(tag.color) end
-
-local board = Instance.new("BillboardGui", head)
-board.Size = UDim2.new(0, 100, 0, 40)
-board.StudsOffset = Vector3.new(0, 5, 0)
-board.Adornee = head
-board.AlwaysOnTop = true
-board.MaxDistance = 25
 
 local function strokeGradient(label, color)
     local stroke = Instance.new("UIStroke", label)
@@ -71,28 +64,89 @@ local function strokeGradient(label, color)
     grad.Color = color
 end
 
-local top = Instance.new("TextLabel", board)
-top.Text = tag.version
-top.Font = Enum.Font.Sarpanch
-top.TextSize = 30
-top.TextColor3 = Color3.new(0, 0, 0)
-top.BackgroundTransparency = 1
-top.Position = UDim2.new(0.5, -50, 1, -15)
-top.Size = UDim2.new(1, 0, 1, 0)
-strokeGradient(top, ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.new(1, 1, 1)),
-    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(100, 100, 100)),
-    ColorSequenceKeypoint.new(1, Color3.new(1, 1, 1))
-})
+local function createTagGui(player, tagData)
+    if not player.Character or not player.Character:FindFirstChild("Head") then return end
+    local head = player.Character.Head
 
-local main = Instance.new("TextLabel", board)
-main.Text = tag.name
-main.Font = Enum.Font.Sarpanch
-main.TextSize = 50
-main.TextColor3 = Color3.new(0, 0, 0)
-main.BackgroundTransparency = 1
-main.Size = UDim2.new(1, 0, 1, 0)
-strokeGradient(main, ColorSequence.new{
-    ColorSequenceKeypoint.new(0, tag.color),
-    ColorSequenceKeypoint.new(1, Color3.new(1, 1, 1))
-})
+    if head:FindFirstChild("SonixTagGui") then return end
+
+    local board = Instance.new("BillboardGui", head)
+    board.Name = "SonixTagGui"
+    board.Size = UDim2.new(0, 100, 0, 40)
+    board.StudsOffset = Vector3.new(0, 5, 0)
+    board.Adornee = head
+    board.AlwaysOnTop = true
+    board.MaxDistance = 25
+
+    local top = Instance.new("TextLabel", board)
+    top.Text = tagData.version
+    top.Font = Enum.Font.Sarpanch
+    top.TextSize = 30
+    top.TextColor3 = Color3.new(0, 0, 0)
+    top.BackgroundTransparency = 1
+    top.Position = UDim2.new(0.5, -50, 1, -15)
+    top.Size = UDim2.new(1, 0, 1, 0)
+    strokeGradient(top, ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.new(1, 1, 1)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(100, 100, 100)),
+        ColorSequenceKeypoint.new(1, Color3.new(1, 1, 1))
+    })
+
+    local main = Instance.new("TextLabel", board)
+    main.Text = tagData.name
+    main.Font = Enum.Font.Sarpanch
+    main.TextSize = 50
+    main.TextColor3 = Color3.new(0, 0, 0)
+    main.BackgroundTransparency = 1
+    main.Size = UDim2.new(1, 0, 1, 0)
+    strokeGradient(main, ColorSequence.new{
+        ColorSequenceKeypoint.new(0, tagData.color),
+        ColorSequenceKeypoint.new(1, Color3.new(1, 1, 1))
+    })
+end
+
+local tag = GetSonixChildren()
+createTagGui(LocalPlayer, tag)
+if tag.rare then
+    SonixHaloSkedaddle(Character, tag.color)
+end
+
+local tagTable = {}
+tagTable[LocalPlayer.Name] = tag
+
+Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function(char)
+        task.wait(1)
+        -- If they've injected the same script, this variable will exist
+        task.spawn(function()
+            while true do
+                local head = char:FindFirstChild("Head")
+                if head and not head:FindFirstChild("SonixTagGui") and tagTable[player.Name] then
+                    local theirTag = tagTable[player.Name]
+                    createTagGui(player, theirTag)
+                    if theirTag.rare then
+                        SonixHaloSkedaddle(char, theirTag.color)
+                    end
+                end
+                task.wait(2)
+            end
+        end)
+    end)
+end)
+
+RunService.RenderStepped:Connect(function()
+    for _, other in pairs(Players:GetPlayers()) do
+        if other ~= LocalPlayer and other.Character and other.Character:FindFirstChild("Head") then
+            local head = other.Character.Head
+            -- Check for tag consistency
+            local theirGui = head:FindFirstChild("SonixTagGui")
+            if theirGui then
+                local label = theirGui:FindFirstChildOfClass("TextLabel")
+                if label and label.Text ~= tag.name then
+                    label.Text = "[MODIFIED] " .. label.Text
+                    label.TextColor3 = Color3.fromRGB(255, 0, 0)
+                end
+            end
+        end
+    end
+end)
