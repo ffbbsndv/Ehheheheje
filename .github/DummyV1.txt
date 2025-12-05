@@ -1,0 +1,781 @@
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local CoreGui = game:GetService("CoreGui")
+local Debris = game:GetService("Debris")
+local HttpService = game:GetService("HttpService")
+
+-- // CONFIGURATION //
+local ActiveDummies = {} 
+local ActiveThreads = {} 
+local AnimData_Left = nil
+local AnimData_Right = nil
+local IsLoading = false
+local IsPaused = false
+local IsMuted = false
+
+-- [1] RANDOM BACKGROUNDS (Add as many GitHub raw links as you want)
+local BackgroundImages = {
+	"https://raw.githubusercontent.com/ffbbsndv/Ehheheheje/refs/heads/main/example_bg1.png", 
+	"https://raw.githubusercontent.com/ffbbsndv/Ehheheheje/refs/heads/main/.github/SuperSigmaLogo.jpg",
+	-- "LINK_3_HERE",
+}
+
+-- [2] INTRO IMAGE (Single image for the start)
+local IntroImgUrl = "https://raw.githubusercontent.com/ffbbsndv/Ehheheheje/refs/heads/main/.github/SuperSigmaLogo.jpg"
+
+local sounds = {
+	["Impacts"] = {8142423452},
+	["Exhales"] = {4792915329, 132420706005896},
+	["Focus"] = {9114687069},
+	["Intro"] = {118448537916332},
+	["UIClick"] = {70452176150315}
+}
+
+-- // UTILITIES //
+local function LoadWebImage(Url, FileName)
+	if not Url or Url == "" then return nil end
+	
+	-- Check for executor support
+	if not makefolder or not writefile or not getcustomasset then
+		return nil -- Fallback to default
+	end
+
+	local FilePath = FileName .. ".png"
+	local success, err = pcall(function()
+		-- Always download fresh for randomness if needed, or cache it
+		-- Here we overwrite to ensure the random pick works if filename is same
+		local content = game:HttpGet(Url)
+		writefile(FilePath, content)
+	end)
+
+	if success then
+		return getcustomasset(FilePath)
+	else
+		warn("Failed to load image: " .. tostring(err))
+		return nil
+	end
+end
+
+local function GetRandomBg()
+	if #BackgroundImages > 0 then
+		local selection = BackgroundImages[math.random(1, #BackgroundImages)]
+		return LoadWebImage(selection, "dummy_v1_random_bg_"..math.random(1,1000))
+	end
+	return nil
+end
+
+local function AddClickSound(obj)
+	if obj:IsA("TextButton") or obj:IsA("ImageButton") then
+		obj.MouseButton1Click:Connect(function()
+			local sfx = Instance.new("Sound")
+			sfx.SoundId = "rbxassetid://" .. sounds.UIClick[1]
+			sfx.Volume = 0.5
+			sfx.Parent = CoreGui
+			sfx:Play()
+			Debris:AddItem(sfx, 1)
+		end)
+	elseif obj:IsA("TextBox") then
+		obj.Focused:Connect(function()
+			local sfx = Instance.new("Sound")
+			sfx.SoundId = "rbxassetid://" .. sounds.UIClick[1]
+			sfx.Volume = 0.5
+			sfx.Parent = CoreGui
+			sfx:Play()
+			Debris:AddItem(sfx, 1)
+		end)
+	end
+end
+
+-- // UI CONSTRUCTION //
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "DummyV1_Gacha"
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+pcall(function() ScreenGui.Parent = CoreGui end)
+if not ScreenGui.Parent then ScreenGui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui") end
+
+-- 1. ROOT FRAME (Invisible Container)
+local RootFrame = Instance.new("Frame")
+RootFrame.Name = "RootFrame"
+RootFrame.Size = UDim2.new(0, 280, 0, 320)
+RootFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+RootFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+RootFrame.BackgroundTransparency = 1
+RootFrame.Active = true
+RootFrame.Draggable = true
+RootFrame.Parent = ScreenGui
+
+-- 2. SIDE MENU (The Drawer - Hidden Behind Main)
+local SideMenu = Instance.new("Frame")
+SideMenu.Name = "SideMenu"
+SideMenu.Size = UDim2.new(0, 140, 0.9, 0) -- Slightly smaller than main
+SideMenu.Position = UDim2.new(0.5, 0, 0.05, 0) -- Starts hidden
+SideMenu.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+SideMenu.BorderSizePixel = 0
+SideMenu.ZIndex = 1 -- Behind Main Panel
+SideMenu.Parent = RootFrame
+Instance.new("UICorner", SideMenu).CornerRadius = UDim.new(0, 8)
+
+local SideList = Instance.new("UIListLayout")
+SideList.Parent = SideMenu
+SideList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+SideList.VerticalAlignment = Enum.VerticalAlignment.Top
+SideList.Padding = UDim.new(0, 10)
+SideList.SortOrder = Enum.SortOrder.LayoutOrder
+
+local SidePad = Instance.new("UIPadding")
+SidePad.PaddingTop = UDim.new(0, 15)
+SidePad.Parent = SideMenu
+
+local function CreateSideBtn(Text, Color)
+	local Btn = Instance.new("TextButton")
+	Btn.Size = UDim2.new(0.85, 0, 0, 35)
+	Btn.BackgroundColor3 = Color
+	Btn.Text = Text
+	Btn.TextColor3 = Color3.new(1,1,1)
+	Btn.Font = Enum.Font.FredokaOne
+	Btn.TextSize = 14
+	Btn.ZIndex = 2
+	Btn.Parent = SideMenu
+	Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 6)
+	AddClickSound(Btn)
+	return Btn
+end
+
+local ClearBtn = CreateSideBtn("Clear Dummies", Color3.fromRGB(192, 57, 43))
+local MuteBtn = CreateSideBtn("Mute Audio", Color3.fromRGB(243, 156, 18))
+local CreditsLbl = Instance.new("TextLabel")
+CreditsLbl.Size = UDim2.new(0.9, 0, 0, 100)
+CreditsLbl.BackgroundTransparency = 1
+CreditsLbl.TextColor3 = Color3.fromRGB(150, 150, 150)
+CreditsLbl.TextWrapped = true
+CreditsLbl.Text = "Credits:\n\nScript by Sonix\nUI Idea by Kevin\n\nTs script so peak😔"
+CreditsLbl.Font = Enum.Font.SourceSans
+CreditsLbl.TextSize = 18
+CreditsLbl.ZIndex = 2
+CreditsLbl.Parent = SideMenu
+
+-- 3. MAIN VISUAL PANEL
+local MainPanel = Instance.new("Frame")
+MainPanel.Name = "MainPanel"
+MainPanel.Size = UDim2.new(1, 0, 1, 0)
+MainPanel.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+MainPanel.BackgroundTransparency = 0
+MainPanel.BorderSizePixel = 0
+MainPanel.ClipsDescendants = true 
+MainPanel.ZIndex = 5 -- Above SideMenu
+MainPanel.Parent = RootFrame
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 8) 
+MainCorner.Parent = MainPanel
+
+local MainStroke = Instance.new("UIStroke")
+MainStroke.Thickness = 6 
+MainStroke.Color = Color3.fromRGB(60, 60, 60) 
+MainStroke.Parent = MainPanel
+
+-- ** RANDOM BACKGROUND IMAGE **
+local loadedMainBg = GetRandomBg()
+if loadedMainBg then
+	local MainBg = Instance.new("ImageLabel")
+	MainBg.Size = UDim2.new(1, 0, 1, 0)
+	MainBg.BackgroundTransparency = 1
+	MainBg.ImageTransparency = 0.5 -- Fade it so text reads well
+	MainBg.Image = loadedMainBg
+	MainBg.ScaleType = Enum.ScaleType.Crop
+	MainBg.ZIndex = 4 
+	MainBg.Parent = MainPanel
+	Instance.new("UICorner", MainBg).CornerRadius = UDim.new(0, 8)
+end
+
+-- Header
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 25)
+Title.Position = UDim2.new(0, 0, 0.02, 0)
+Title.BackgroundTransparency = 1
+Title.TextColor3 = Color3.new(1,1,1)
+Title.Text = "Dummy V1"
+Title.Font = Enum.Font.FredokaOne
+Title.TextSize = 24
+Title.ZIndex = 6
+Title.Parent = MainPanel
+
+local SubTitle = Instance.new("TextLabel")
+SubTitle.Size = UDim2.new(1, 0, 0, 15)
+SubTitle.Position = UDim2.new(0, 0, 0.10, 0)
+SubTitle.BackgroundTransparency = 1
+SubTitle.TextColor3 = Color3.fromRGB(150, 150, 150)
+SubTitle.Text = "Yours truly, kevin"
+SubTitle.Font = Enum.Font.SourceSansItalic
+SubTitle.TextSize = 12
+SubTitle.ZIndex = 6
+SubTitle.Parent = MainPanel
+
+-- WINDOW CONTROLS
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Size = UDim2.new(0, 25, 0, 25)
+CloseBtn.Position = UDim2.new(1, -30, 0, 5) 
+CloseBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+CloseBtn.Text = "X"
+CloseBtn.TextColor3 = Color3.new(1,1,1)
+CloseBtn.Font = Enum.Font.FredokaOne
+CloseBtn.ZIndex = 10
+CloseBtn.Parent = MainPanel
+Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 6)
+AddClickSound(CloseBtn)
+
+-- SETTINGS SLIDER BUTTON
+local SettingsBtn = Instance.new("TextButton")
+SettingsBtn.Size = UDim2.new(0, 20, 0, 60)
+SettingsBtn.Position = UDim2.new(1, -20, 0.5, -30)
+SettingsBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+SettingsBtn.Text = ">"
+SettingsBtn.TextColor3 = Color3.new(1,1,1)
+SettingsBtn.Font = Enum.Font.FredokaOne
+SettingsBtn.ZIndex = 10
+SettingsBtn.Parent = MainPanel
+Instance.new("UICorner", SettingsBtn).CornerRadius = UDim.new(0, 4)
+AddClickSound(SettingsBtn)
+
+-- INPUTS
+local function CreateControlRow(yPos, labelText, btnName)
+	local Label = Instance.new("TextLabel")
+	Label.Size = UDim2.new(1, 0, 0, 15)
+	Label.Position = UDim2.new(0, 0, yPos, 0)
+	Label.BackgroundTransparency = 1
+	Label.TextColor3 = Color3.fromRGB(200, 200, 200)
+	Label.Text = labelText
+	Label.TextSize = 12
+	Label.ZIndex = 6
+	Label.Parent = MainPanel
+
+	local Box = Instance.new("TextBox")
+	Box.Size = UDim2.new(0.65, 0, 0, 30)
+	Box.Position = UDim2.new(0.05, 0, yPos + 0.06, 0)
+	Box.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+	Box.TextColor3 = Color3.new(1,1,1)
+	Box.PlaceholderText = "Empty = Yourself"
+	Box.Text = ""
+	Box.TextSize = 12
+	Box.ZIndex = 6
+	Box.Parent = MainPanel
+	Instance.new("UICorner", Box).CornerRadius = UDim.new(0, 6)
+	AddClickSound(Box)
+	
+	local ViewBtn = Instance.new("TextButton")
+	ViewBtn.Name = btnName
+	ViewBtn.Size = UDim2.new(0.25, 0, 0, 30)
+	ViewBtn.Position = UDim2.new(0.72, 0, yPos + 0.06, 0)
+	ViewBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+	ViewBtn.TextColor3 = Color3.new(1,1,1)
+	ViewBtn.Text = "View"
+	ViewBtn.Font = Enum.Font.SourceSansBold
+	ViewBtn.TextSize = 12
+	ViewBtn.ZIndex = 6
+	ViewBtn.Parent = MainPanel
+	Instance.new("UICorner", ViewBtn).CornerRadius = UDim.new(0, 6)
+	AddClickSound(ViewBtn)
+	
+	return Box, ViewBtn
+end
+
+local InputBox1, ViewBtn1 = CreateControlRow(0.18, "Left Dummy (Anim: Submit)", "ViewLeft")
+local InputBox2, ViewBtn2 = CreateControlRow(0.38, "Right Dummy (Anim: Dominate)", "ViewRight")
+
+local SpeedLabel = Instance.new("TextLabel")
+SpeedLabel.Size = UDim2.new(1, 0, 0, 15)
+SpeedLabel.Position = UDim2.new(0, 0, 0.58, 0)
+SpeedLabel.BackgroundTransparency = 1
+SpeedLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+SpeedLabel.Text = "Speed [Max:10]"
+SpeedLabel.TextSize = 12
+SpeedLabel.ZIndex = 6
+SpeedLabel.Parent = MainPanel
+
+local SpeedBox = Instance.new("TextBox")
+SpeedBox.Size = UDim2.new(0.9, 0, 0, 30)
+SpeedBox.Position = UDim2.new(0.05, 0, 0.64, 0)
+SpeedBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+SpeedBox.TextColor3 = Color3.new(1, 1, 0)
+SpeedBox.Text = "1"
+SpeedBox.TextSize = 14
+SpeedBox.Font = Enum.Font.SourceSansBold
+SpeedBox.ZIndex = 6
+SpeedBox.Parent = MainPanel
+Instance.new("UICorner", SpeedBox).CornerRadius = UDim.new(0, 6)
+AddClickSound(SpeedBox)
+
+local ApplyBtn = Instance.new("TextButton")
+ApplyBtn.Size = UDim2.new(0.9, 0, 0, 35)
+ApplyBtn.Position = UDim2.new(0.05, 0, 0.77, 0)
+ApplyBtn.BackgroundColor3 = Color3.fromRGB(46, 204, 113) 
+ApplyBtn.TextColor3 = Color3.new(1,1,1)
+ApplyBtn.Text = "Spawn Dummies"
+ApplyBtn.Font = Enum.Font.SourceSansBold
+ApplyBtn.TextSize = 14
+ApplyBtn.ZIndex = 6
+ApplyBtn.Parent = MainPanel
+Instance.new("UICorner", ApplyBtn).CornerRadius = UDim.new(0, 6)
+AddClickSound(ApplyBtn)
+
+local ResetCamBtn = Instance.new("TextButton")
+ResetCamBtn.Size = UDim2.new(0.9, 0, 0, 25)
+ResetCamBtn.Position = UDim2.new(0.05, 0, 0.90, 0)
+ResetCamBtn.BackgroundColor3 = Color3.fromRGB(192, 57, 43) 
+ResetCamBtn.TextColor3 = Color3.new(1,1,1)
+ResetCamBtn.Text = "Reset Camera"
+ResetCamBtn.Font = Enum.Font.SourceSansBold
+ResetCamBtn.TextSize = 12
+ResetCamBtn.ZIndex = 6
+ResetCamBtn.Parent = MainPanel
+Instance.new("UICorner", ResetCamBtn).CornerRadius = UDim.new(0, 6)
+AddClickSound(ResetCamBtn)
+
+-- // FOCUS UI //
+local FocusScene = Instance.new("ScreenGui")
+FocusScene.Name = "FocusScene"
+FocusScene.IgnoreGuiInset = true
+pcall(function() FocusScene.Parent = CoreGui end)
+if not FocusScene.Parent then FocusScene.Parent = Players.LocalPlayer:WaitForChild("PlayerGui") end
+
+local FocusFrame = Instance.new("ImageLabel")
+FocusFrame.Image = "rbxassetid://12293645094"
+FocusFrame.ImageTransparency = 1 
+FocusFrame.BackgroundTransparency = 1
+FocusFrame.Size = UDim2.new(1, 0, 1, 0)
+FocusFrame.Parent = FocusScene
+
+local FocusBtn = Instance.new("TextButton")
+FocusBtn.Text = "Focus"
+FocusBtn.Font = Enum.Font.SourceSansBold
+FocusBtn.TextColor3 = Color3.new(1,1,1)
+FocusBtn.TextSize = 20
+FocusBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+FocusBtn.BackgroundTransparency = 0.3
+FocusBtn.Position = UDim2.new(0.85, 0, 0.5, -25) 
+FocusBtn.Size = UDim2.new(0, 100, 0, 50)
+FocusBtn.Parent = FocusScene
+Instance.new("UICorner", FocusBtn).CornerRadius = UDim.new(0, 8)
+AddClickSound(FocusBtn)
+
+-- // INTRO COVER //
+local IntroCover = Instance.new("Frame")
+IntroCover.Size = UDim2.new(1, 0, 1, 0)
+IntroCover.BackgroundTransparency = 1
+IntroCover.ZIndex = 20
+IntroCover.Parent = MainPanel
+Instance.new("UICorner", IntroCover).CornerRadius = UDim.new(0, 8)
+
+local LeftDoor = Instance.new("Frame")
+LeftDoor.Size = UDim2.new(0.5, 0, 1, 0)
+LeftDoor.BackgroundColor3 = Color3.fromRGB(25, 25, 25) 
+LeftDoor.BorderSizePixel = 0
+LeftDoor.ZIndex = 21
+LeftDoor.Parent = IntroCover
+
+local RightDoor = Instance.new("Frame")
+RightDoor.Size = UDim2.new(0.5, 0, 1, 0)
+RightDoor.Position = UDim2.new(0.5, 0, 0, 0)
+RightDoor.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+RightDoor.BorderSizePixel = 0
+RightDoor.ZIndex = 21
+RightDoor.Parent = IntroCover
+
+local IntroContent = Instance.new("Frame")
+IntroContent.Size = UDim2.new(1, 0, 1, 0)
+IntroContent.BackgroundTransparency = 1
+IntroContent.ZIndex = 25
+IntroContent.Parent = IntroCover
+
+-- INTRO IMAGE
+local loadedIntroImg = LoadWebImage(IntroImgUrl, "dummy_intro_img")
+local I_Img = Instance.new("ImageLabel")
+I_Img.Size = UDim2.new(0, 120, 0, 120)
+I_Img.Position = UDim2.new(0.5, -60, 0.25, 0) 
+I_Img.BackgroundTransparency = 1
+I_Img.ZIndex = 26
+I_Img.Image = loadedIntroImg or "rbxthumb://type=Avatar&id="..Players.LocalPlayer.UserId.."&w=420&h=420"
+I_Img.Parent = IntroContent
+Instance.new("UICorner", I_Img).CornerRadius = UDim.new(1, 0) 
+
+local I_Title = Instance.new("TextLabel")
+I_Title.Size = UDim2.new(1, 0, 0, 40)
+I_Title.Position = UDim2.new(0, 0, 0.55, 0)
+I_Title.BackgroundTransparency = 1
+I_Title.TextColor3 = Color3.new(1,1,1)
+I_Title.Text = "Dummy V1"
+I_Title.Font = Enum.Font.FredokaOne
+I_Title.TextSize = 32
+I_Title.ZIndex = 26
+I_Title.Parent = IntroContent
+
+local PlayBtn = Instance.new("TextButton")
+PlayBtn.Size = UDim2.new(0, 140, 0, 45)
+PlayBtn.Position = UDim2.new(0.5, -70, 0.75, 0)
+PlayBtn.BackgroundColor3 = Color3.fromRGB(46, 204, 113) 
+PlayBtn.TextColor3 = Color3.new(1,1,1)
+PlayBtn.Text = "PLAY"
+PlayBtn.Font = Enum.Font.FredokaOne
+PlayBtn.TextSize = 24
+PlayBtn.ZIndex = 26
+PlayBtn.Parent = IntroContent
+Instance.new("UICorner", PlayBtn).CornerRadius = UDim.new(0, 8)
+AddClickSound(PlayBtn)
+
+-- // CONFIRMATION POPUP //
+local ConfirmFrame = Instance.new("Frame")
+ConfirmFrame.Size = UDim2.new(0, 220, 0, 120)
+ConfirmFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+ConfirmFrame.Position = UDim2.new(0.5, 0, 0.5, 0) 
+ConfirmFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+ConfirmFrame.Visible = false
+ConfirmFrame.ZIndex = 100 
+ConfirmFrame.Parent = ScreenGui 
+Instance.new("UICorner", ConfirmFrame).CornerRadius = UDim.new(0, 10)
+local UIStroke = Instance.new("UIStroke")
+UIStroke.Color = Color3.fromRGB(0,0,0); UIStroke.Thickness = 2; UIStroke.Parent = ConfirmFrame
+
+local ConfirmText = Instance.new("TextLabel")
+ConfirmText.Size = UDim2.new(0.9, 0, 0.4, 0)
+ConfirmText.Position = UDim2.new(0.05, 0, 0.1, 0)
+ConfirmText.BackgroundTransparency = 1
+ConfirmText.TextColor3 = Color3.new(1,1,1)
+ConfirmText.Text = "Are you sure?"
+ConfirmText.Font = Enum.Font.SourceSansBold
+ConfirmText.TextSize = 18
+ConfirmText.ZIndex = 101 
+ConfirmText.Parent = ConfirmFrame
+
+local YesBtn = Instance.new("TextButton")
+YesBtn.Size = UDim2.new(0.4, 0, 0, 30)
+YesBtn.Position = UDim2.new(0.05, 0, 0.6, 0)
+YesBtn.BackgroundColor3 = Color3.fromRGB(46, 204, 113) 
+YesBtn.Text = "YES"
+YesBtn.Font = Enum.Font.FredokaOne
+YesBtn.ZIndex = 101 
+YesBtn.Parent = ConfirmFrame
+Instance.new("UICorner", YesBtn).CornerRadius = UDim.new(0, 6)
+AddClickSound(YesBtn)
+
+local NoBtn = Instance.new("TextButton")
+NoBtn.Size = UDim2.new(0.4, 0, 0, 30)
+NoBtn.Position = UDim2.new(0.55, 0, 0.6, 0)
+NoBtn.BackgroundColor3 = Color3.fromRGB(231, 76, 60) 
+NoBtn.Text = "NO"
+NoBtn.Font = Enum.Font.FredokaOne
+NoBtn.ZIndex = 101 
+NoBtn.Parent = ConfirmFrame
+Instance.new("UICorner", NoBtn).CornerRadius = UDim.new(0, 6)
+AddClickSound(NoBtn)
+
+-- // LOGIC HANDLERS //
+
+-- SIDE SLIDER LOGIC
+local isSettingsOpen = false
+SettingsBtn.MouseButton1Click:Connect(function()
+	isSettingsOpen = not isSettingsOpen
+	if isSettingsOpen then
+		SettingsBtn.Text = "<"
+		-- Slide Out to the right (X = 1 + padding)
+		TweenService:Create(SideMenu, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Position = UDim2.new(1, 10, 0.05, 0)}):Play()
+	else
+		SettingsBtn.Text = ">"
+		-- Slide In (Behind main)
+		TweenService:Create(SideMenu, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {Position = UDim2.new(0.5, 0, 0.05, 0)}):Play()
+	end
+end)
+
+ClearBtn.MouseButton1Click:Connect(function()
+	for _, d in pairs(ActiveDummies) do if d then d:Destroy() end end
+	ActiveDummies = {}
+end)
+
+MuteBtn.MouseButton1Click:Connect(function()
+	IsMuted = not IsMuted
+	MuteBtn.Text = IsMuted and "Unmute Audio" or "Mute Audio"
+	MuteBtn.BackgroundColor3 = IsMuted and Color3.fromRGB(100, 100, 100) or Color3.fromRGB(243, 156, 18)
+end)
+
+local focusDebounce = false
+FocusBtn.MouseButton1Click:Connect(function()
+	if focusDebounce then return end
+	focusDebounce = true
+	IsPaused = true
+	
+	local soundTarget = nil
+	for _, dummy in pairs(ActiveDummies) do
+		if dummy.Name == "Dummy_Left" and dummy:FindFirstChild("Torso") then soundTarget = dummy.Torso break end
+	end
+	
+	TweenService:Create(workspace.CurrentCamera, TweenInfo.new(1), { FieldOfView = 50 }):Play()
+	TweenService:Create(FocusFrame, TweenInfo.new(1), { ImageTransparency = 0 }):Play()
+	
+	if soundTarget and not IsMuted then
+		local sfx = Instance.new("Sound")
+		sfx.Parent = soundTarget
+		sfx.Volume = 1.5
+		sfx.SoundId = "rbxassetid://" .. sounds.Focus[math.random(1, #sounds.Focus)]
+		sfx:Play()
+		Debris:AddItem(sfx, 5)
+	end
+	
+	task.wait(4)
+	
+	IsPaused = false
+	TweenService:Create(workspace.CurrentCamera, TweenInfo.new(1), { FieldOfView = 70 }):Play()
+	TweenService:Create(FocusFrame, TweenInfo.new(1), { ImageTransparency = 1 }):Play()
+	focusDebounce = false
+end)
+
+local function FullCleanup()
+	for _, list in pairs(ActiveThreads) do for _, t in pairs(list) do task.cancel(t) end end
+	for _, d in pairs(ActiveDummies) do if d then d:Destroy() end end
+	ScreenGui:Destroy()
+	FocusScene:Destroy() 
+end
+
+CloseBtn.MouseButton1Click:Connect(function() ConfirmFrame.Visible = true end)
+NoBtn.MouseButton1Click:Connect(function() ConfirmFrame.Visible = false end)
+YesBtn.MouseButton1Click:Connect(function() FullCleanup() end)
+
+PlayBtn.MouseButton1Click:Connect(function()
+	if not IsMuted then
+		local sfx = Instance.new("Sound")
+		sfx.SoundId = "rbxassetid://" .. sounds.Intro[1]
+		sfx.Volume = 1
+		sfx.Parent = ScreenGui
+		sfx:Play()
+		Debris:AddItem(sfx, 5)
+	end
+	
+	local info = TweenInfo.new(0.8, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+	TweenService:Create(I_Title, info, {TextTransparency = 1}):Play()
+	TweenService:Create(I_Img, info, {ImageTransparency = 1}):Play()
+	TweenService:Create(PlayBtn, info, {TextTransparency = 1, BackgroundTransparency = 1}):Play()
+	TweenService:Create(LeftDoor, info, {Position = UDim2.new(-0.5, 0, 0, 0)}):Play()
+	TweenService:Create(RightDoor, info, {Position = UDim2.new(1.0, 0, 0, 0)}):Play()
+	task.wait(0.8)
+	IntroCover:Destroy()
+end)
+
+local function SetCameraSubject(Subject)
+	local Cam = workspace.CurrentCamera
+	if Subject and Subject:FindFirstChild("Humanoid") then
+		Cam.CameraSubject = Subject.Humanoid
+	else
+		local char = Players.LocalPlayer.Character
+		if char and char:FindFirstChild("Humanoid") then
+			Cam.CameraSubject = char.Humanoid
+		end
+	end
+end
+
+local function BuildPartAnimations(AnimationTable)
+	local PartAnimations = {}
+	local SortedTimestamps = {}
+	for Timestamp in pairs(AnimationTable) do table.insert(SortedTimestamps, Timestamp) end
+	table.sort(SortedTimestamps)
+	for _, Timestamp in ipairs(SortedTimestamps) do
+		local Poses = AnimationTable[Timestamp]
+		for PartName, PoseData in pairs(Poses) do
+			if not PartAnimations[PartName] then PartAnimations[PartName] = {} end
+			table.insert(PartAnimations[PartName], {Timestamp, PoseData.CFrame, PoseData.Style or Enum.EasingStyle.Linear, PoseData.Direction or Enum.EasingDirection.In})
+		end
+	end
+	return PartAnimations
+end
+
+function PlayAnimationForDummy(DummyModel, AnimTable, Loop, Speed)
+	if ActiveThreads[DummyModel] then for _, t in pairs(ActiveThreads[DummyModel]) do task.cancel(t) end end
+	ActiveThreads[DummyModel] = {}
+	
+	local MyMotors = DummyMotors[DummyModel]
+	if not MyMotors then return end
+	local PartAnimations = BuildPartAnimations(AnimTable)
+	
+	for PartName, Keyframes in pairs(PartAnimations) do
+		if MyMotors[PartName] then
+			local Thread = task.spawn(function()
+				while true do
+					for i = 1, #Keyframes do
+						if not ActiveThreads[DummyModel] then return end
+						while IsPaused do task.wait(0.1) end
+						
+						if not MyMotors[PartName].Motor or not MyMotors[PartName].Motor.Parent then return end
+						local Frame = Keyframes[i]
+						local PrevFrame = (i == 1) and Keyframes[#Keyframes] or Keyframes[i - 1]
+						local Duration = (i == 1) and (Frame[1]/Speed) or ((Frame[1] - PrevFrame[1])/Speed)
+						if Duration <= 0 then Duration = 0.05 end
+						
+						local Tween = TweenService:Create(
+							MyMotors[PartName].Motor,
+							TweenInfo.new(Duration, Frame[3], Frame[4]),
+							{C0 = MyMotors[PartName].OriginalC0 * Frame[2]}
+						)
+						Tween:Play()
+						task.wait(Duration)
+					end
+					if not Loop ~= false then break end
+				end
+			end)
+			table.insert(ActiveThreads[DummyModel], Thread)
+		end
+	end
+end
+
+local function StartSoundLoop(DummyModel)
+	local thread = task.spawn(function()
+		while true do
+			if not DummyModel or not DummyModel.Parent then break end
+			while IsPaused do task.wait(0.1) end
+			
+			local Torso = DummyModel:FindFirstChild("Torso")
+			if Torso and not IsMuted then
+				local sfx = Instance.new("Sound")
+				sfx.Parent = Torso
+				sfx.Volume = 1
+				sfx.SoundId = "rbxassetid://" .. sounds.Impacts[math.random(1, #sounds.Impacts)]
+				sfx:Play()
+				Debris:AddItem(sfx, 2)
+				
+				if math.random() <= 0.4 then
+					local sfx2 = Instance.new("Sound")
+					sfx2.Parent = Torso
+					sfx2.Volume = 1
+					sfx2.SoundId = "rbxassetid://" .. sounds.Exhales[math.random(1, #sounds.Exhales)]
+					sfx2.PlayOnRemove = true 
+					sfx2:Play()
+					Debris:AddItem(sfx2, 2)
+				end
+				if sfx.IsPlaying then sfx.Ended:Wait() else task.wait(1) end
+			else
+				task.wait(0.5)
+			end
+		end
+	end)
+	if not ActiveThreads[DummyModel] then ActiveThreads[DummyModel] = {} end
+	table.insert(ActiveThreads[DummyModel], thread)
+end
+
+local function SafeLoad(Url)
+	local BustUrl = Url .. "?t=" .. tostring(math.random(1, 100000))
+	local success, result = pcall(function()
+		local content = game:HttpGet(BustUrl)
+		local func = loadstring(content)
+		local env = {}; setmetatable(env, {__index = getfenv()}); setfenv(func, env)
+		local ret = func()
+		if not ret then for k, v in pairs(env) do if type(v) == "table" and k ~= "_G" and k ~= "shared" then return v end end end
+		return ret
+	end)
+	return success and result or nil
+end
+
+local function AddNameTag(Model, Text, Color)
+	local Head = Model:WaitForChild("Head")
+	local bg = Instance.new("BillboardGui")
+	bg.Size = UDim2.new(0, 100, 0, 50)
+	bg.StudsOffset = Vector3.new(0, 3, 0)
+	bg.Adornee = Head
+	bg.Parent = Head
+	local txt = Instance.new("TextLabel")
+	txt.Size = UDim2.new(1,0,1,0)
+	txt.BackgroundTransparency = 1
+	txt.TextColor3 = Color or Color3.new(1,1,1) 
+	txt.TextStrokeTransparency = 0
+	txt.Text = Text
+	txt.Font = Enum.Font.SourceSansBold
+	txt.TextSize = 20
+	txt.Parent = bg
+end
+
+local function SetupDummy(DummyModel, SpecificAnimData, TagText, Speed, TagColor)
+	local Humanoid = DummyModel:WaitForChild("Humanoid")
+	if DummyModel:FindFirstChild("Animate") then DummyModel.Animate:Destroy() end
+	Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None 
+	Humanoid.HealthDisplayType = Enum.HumanoidHealthDisplayType.AlwaysOff
+	DummyModel.HumanoidRootPart.Anchored = true
+	AddNameTag(DummyModel, TagText, TagColor) 
+	local Animator = Humanoid:FindFirstChildOfClass("Animator") or Instance.new("Animator", Humanoid)
+	for _, v in pairs(Animator:GetPlayingAnimationTracks()) do v:Stop() end
+	
+	local Motor6DMap = {["Head"]="Neck", ["Torso"]="RootJoint", ["Left Arm"]="Left Shoulder", ["Right Arm"]="Right Shoulder", ["Left Leg"]="Left Hip", ["Right Leg"]="Right Hip"}
+	local MyMotors = {}
+	for PartName, MotorName in pairs(Motor6DMap) do
+		local Motor = DummyModel:FindFirstChild(MotorName, true)
+		if Motor then MyMotors[PartName] = { Motor = Motor, OriginalC0 = Motor.C0 } end
+	end
+	DummyMotors[DummyModel] = MyMotors
+	
+	if SpecificAnimData then PlayAnimationForDummy(DummyModel, SpecificAnimData, true, Speed) end
+end
+
+local function GetUserIdFromText(text)
+	if text == "" or text == nil then return Players.LocalPlayer.UserId end 
+	local num = tonumber(text)
+	if num then return num end 
+	local success, id = pcall(function() return Players:GetUserIdFromNameAsync(text) end)
+	return success and id or Players.LocalPlayer.UserId 
+end
+
+local function LoadDummies(Id1, Id2, Speed)
+	if IsLoading then return end
+	IsLoading = true
+	ApplyBtn.Text = "Processing..."
+	
+	for _, dummy in pairs(ActiveDummies) do
+		if ActiveThreads[dummy] then for _, t in pairs(ActiveThreads[dummy]) do task.cancel(t) end end
+		dummy:Destroy()
+	end
+	ActiveDummies = {}
+	
+	local desc1 = Instance.new("HumanoidDescription")
+	local desc2 = Instance.new("HumanoidDescription")
+	pcall(function() desc1 = Players:GetHumanoidDescriptionFromUserId(Id1) end)
+	pcall(function() desc2 = Players:GetHumanoidDescriptionFromUserId(Id2) end)
+	local rootCFrame = Players.LocalPlayer.Character.PrimaryPart.CFrame
+
+	local dummy1 = Players:CreateHumanoidModelFromDescription(desc1, Enum.HumanoidRigType.R6)
+	dummy1.Name = "Dummy_Left"
+	dummy1:SetPrimaryPartCFrame(rootCFrame * CFrame.new(0, -5, -5)) 
+	dummy1.Parent = game.Workspace
+	table.insert(ActiveDummies, dummy1)
+	SetupDummy(dummy1, AnimData_Left, "SUBMIT", Speed, Color3.fromRGB(255, 105, 180)) 
+	StartSoundLoop(dummy1)
+
+	local dummy2 = Players:CreateHumanoidModelFromDescription(desc2, Enum.HumanoidRigType.R6)
+	dummy2.Name = "Dummy_Right"
+	dummy2:SetPrimaryPartCFrame(rootCFrame * CFrame.new(0, 5, -5)) 
+	dummy2.Parent = game.Workspace
+	table.insert(ActiveDummies, dummy2)
+	SetupDummy(dummy2, AnimData_Right, "DOMINATE", Speed, Color3.fromRGB(50, 205, 50))
+	
+	IsLoading = false
+	ApplyBtn.Text = "Spawn Dummies"
+end
+
+task.spawn(function()
+	AnimData_Left = SafeLoad("https://raw.githubusercontent.com/ffbbsndv/Ehheheheje/refs/heads/main/.github/submit.txt")
+	AnimData_Right = SafeLoad("https://raw.githubusercontent.com/ffbbsndv/Ehheheheje/refs/heads/main/.github/Dominatee.txt")
+end)
+
+ApplyBtn.MouseButton1Click:Connect(function()
+	if IsLoading then return end
+	local Id1 = GetUserIdFromText(InputBox1.Text)
+	local Id2 = GetUserIdFromText(InputBox2.Text)
+	local speed = tonumber(SpeedBox.Text)
+	if not speed or speed <= 0 then speed = 1 elseif speed > 10 then speed = 10 end
+	SpeedBox.Text = tostring(speed)
+	LoadDummies(Id1, Id2, speed)
+end)
+
+ViewBtn1.MouseButton1Click:Connect(function()
+	local dummy = game.Workspace:FindFirstChild("Dummy_Left")
+	if dummy then SetCameraSubject(dummy) end
+end)
+
+ViewBtn2.MouseButton1Click:Connect(function()
+	local dummy = game.Workspace:FindFirstChild("Dummy_Right")
+	if dummy then SetCameraSubject(dummy) end
+end)
+
+ResetCamBtn.MouseButton1Click:Connect(function() SetCameraSubject(nil) end)
