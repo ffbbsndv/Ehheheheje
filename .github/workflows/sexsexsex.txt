@@ -124,7 +124,7 @@ local function BuildPartAnimations(AnimationTable)
 end
 
 function PlayAnimation(Name, AnimationTable, Loop, Speed)
-	Speed = Speed or 1
+	Speed = Speed or 2.5
 	Loop = Loop ~= false
 	StopAnimation(Name)
 
@@ -773,7 +773,7 @@ AlignCharacter(game.Players.LocalPlayer.Character["Black"].Handle, riggy.Torso, 
 AlignCharacter(game.Players.LocalPlayer.Character["Robloxclassicred"].Handle, riggy.Torso, Vector3.new(0, 0, 0), Vector3.new(90, 0, 0))
 for index, asset in pairs(riggy:GetChildren()) do
 		if asset:IsA("BasePart") then
-			asset.Transparency = 1
+			asset.Transparency = 0.7
 		end
 	end
     else
@@ -805,7 +805,7 @@ Converted["_Cum"].MouseButton1Click:Connect(function()
 			game:GetService("TweenService"):Create(Converted["_CumFrame"], TweenInfo.new(1), { ImageTransparency = 0 }):Play()
 			local sfx = Instance.new("Sound")
 			sfx.Parent = riggy.Torso
-			sfx.Volume = 1
+			sfx.Volume = 1.5
 			sfx.SoundId = "rbxassetid://" .. sounds.Nuts[math.random(1, #sounds.Nuts)]
 			sfx:Play()
 			task.wait(4)
@@ -871,7 +871,7 @@ local function BuildPartAnimations(AnimationTable)
 end
 
 function PlayAnimation(Name, AnimationTable, Loop, Speed)
-	Speed = Speed or 1
+	Speed = Speed or 2.5
 	Loop = Loop ~= false
 	StopAnimation(Name)
 
